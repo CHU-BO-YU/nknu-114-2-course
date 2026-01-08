@@ -501,6 +501,14 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    height: 40px;
+    /* 固定高度 */
+    min-width: 100px;
+    /* 最小寬度 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .btn-primary {
@@ -533,6 +541,37 @@ body {
 .btn-sm {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: 0.85rem;
+}
+
+.secondary-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+    background: var(--gray-100);
+    border-color: var(--primary);
+}
+
+.danger-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-md);
+    background: rgba(205, 92, 92, 0.1);
+    color: var(--danger);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.danger-btn:hover {
+    background: rgba(205, 92, 92, 0.2);
 }
 
 /* ========================================
@@ -595,9 +634,23 @@ body {
    ======================================== */
 
 @media (max-width: 768px) {
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+
+    .header {
+        padding: var(--spacing-md) 0;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+    }
+
     .filter-section {
         flex-direction: column;
         align-items: stretch;
+        padding: var(--spacing-md);
+        gap: var(--spacing-sm);
     }
 
     .filter-group select {
@@ -607,12 +660,37 @@ body {
     .filter-stats {
         margin-left: 0;
         text-align: center;
+        margin-top: var(--spacing-sm);
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .action-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .action-buttons button {
+        flex: 1;
+        padding: var(--spacing-sm);
+        font-size: 0.85rem;
     }
 
     .schedule-table th,
     .schedule-table td {
-        padding: var(--spacing-xs);
-        font-size: 0.75rem;
+        padding: 2px;
+        font-size: 0.7rem;
+        height: auto;
+        min-height: 40px;
+    }
+
+    .schedule-cell {
+        font-size: 0.65rem;
+        padding: 2px;
     }
 
     .schedule-actions {
@@ -621,6 +699,15 @@ body {
 
     .list-actions {
         flex-wrap: wrap;
+    }
+
+    .list-actions button {
+        flex: 1;
+    }
+
+    .course-meta {
+        flex-direction: column;
+        gap: 4px;
     }
 }
 

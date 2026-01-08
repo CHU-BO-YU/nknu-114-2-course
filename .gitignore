@@ -6,3 +6,7 @@ __pycache__/
 venv/
 output/
 *.log
+
+# 爬蟲相關檔案 (不部署到 GitHub Pages)
+scraper.py
+requirements.txt

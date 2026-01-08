@@ -15,8 +15,7 @@
 <body>
     <header class="header">
         <div class="container">
-            <h1 class="logo">排課系統</h1>
-            <p class="subtitle">課程選課助手</p>
+            <h1 class="logo">國立高雄師範大學排課系統</h1>
         </div>
     </header>
 
@@ -82,8 +81,10 @@
 
             <!-- 課表 -->
             <section class="schedule-section">
-                <h2>我的課表 <span id="selected-credits">(0 學分)</span></h2>
-                <div class="schedule-wrapper">
+                <div class="section-header">
+                    <h2>我的課表 <span id="selected-credits">(0 學分)</span></h2>
+                </div>
+                <div class="schedule-wrapper" id="schedule-capture">
                     <table class="schedule-table" id="schedule-table">
                         <thead>
                             <tr>
@@ -102,7 +103,8 @@
                 </div>
                 <div class="schedule-actions">
                     <button id="clear-btn" class="btn btn-secondary">清空課表</button>
-                    <button id="export-btn" class="btn btn-primary">匯出圖片</button>
+                    <button id="export-csv-btn" class="btn btn-primary">匯出 CSV</button>
+                    <button id="export-img-btn" class="btn btn-primary">下載圖片</button>
                 </div>
             </section>
         </div>
@@ -123,6 +125,8 @@
         </div>
     </footer>
 
+    <!-- html2canvas 用於截圖 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="app.js"></script>
 </body>
 

@@ -287,10 +287,110 @@ function bindEvents() {
     document.getElementById('type-select').addEventListener('change', filterAndRenderCourses);
     document.getElementById('search-input').addEventListener('input', filterAndRenderCourses);
     document.getElementById('clear-btn').addEventListener('click', clearSchedule);
-    document.getElementById('export-btn').addEventListener('click', exportSchedule);
+    // export-btn 已移除
     document.getElementById('select-all-btn').addEventListener('click', selectAllCourses);
     document.getElementById('deselect-all-btn').addEventListener('click', deselectAllCourses);
+
+    // 新增匯出按鈕事件
+    document.getElementById('export-csv-btn').addEventListener('click', exportScheduleToCSV);
+    document.getElementById('export-img-btn').addEventListener('click', exportScheduleToImage);
+
+    // 頁面載入時還原課表
+    loadFromStorage();
 }
+
+// ========================================
+// 資料持久化 (Persistence)
+// ========================================
+
+function saveToStorage() {
+    localStorage.setItem('selectedCourses', JSON.stringify(selectedCourses));
+}
+
+function loadFromStorage() {
+    const saved = localStorage.getItem('selectedCourses');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            // 驗證資料有效性 (避免舊資料結構導致錯誤)
+            if (Array.isArray(parsed)) {
+                // 比對現有課程資料庫，確保課程代碼仍然有效
+                // (雖然 allCourses 未必已載入，但這裡假設 loadFromStorage 在 fetch 後執行，或僅儲存代碼後來匹配)
+                // 為了簡單起見，我們信任儲存的資料，但重新計算時會依賴 allCourses
+
+                // 這裡有一個時序問題：allCourses 可能還沒載入完。
+                // 我們應該在 init() 的 fetch 完成後呼叫 loadFromStorage
+                selectedCourses = parsed;
+                updateSchedule();
+                updateCourseListState();
+            }
+        } catch (e) {
+            console.error('Failed to load schedule from storage', e);
+            localStorage.removeItem('selectedCourses');
+        }
+    }
+}
+
+// ========================================
+// 匯出功能 (Export)
+// ========================================
+
+function exportScheduleToCSV() {
+    if (selectedCourses.length === 0) {
+        alert('課表是空的，無法匯出');
+        return;
+    }
+
+    // 定義 CSV 標頭
+    const headers = ['課程代碼', '課程名稱', '開課系所', '年級', '類別', '學分', '教師', '時間', '教室'];
+
+    // 轉換資料
+    const rows = selectedCourses.map(c => [
+        c.course_code,
+        c.course_name_zh,
+        c.department,
+        c.offering_unit,
+        c.course_type,
+        c.credits,
+        c.instructor,
+        `"${getClassTime(c)}"`, // 避免逗號分隔錯誤
+        c.classroom
+    ]);
+
+    // 組合 CSV 內容 (加上 BOM 以支援 Excel 中文顯示)
+    const csvContent = '\uFEFF' + [headers, ...rows]
+        .map(e => e.join(','))
+        .join('\n');
+
+    // 下載檔案
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'my_schedule.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function exportScheduleToImage() {
+    const element = document.getElementById('schedule-capture');
+    if (!element) return;
+
+    // 使用 html2canvas 截圖
+    html2canvas(element, {
+        scale: 2, // 提高解析度
+        backgroundColor: '#ffffff', // 確保背景白底
+        useCORS: true // 允許跨域圖片 (雖然這裡沒用到)
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'my_schedule.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+
 
 // ========================================
 // 篩選與渲染課程
@@ -425,6 +525,7 @@ function toggleCourse(courseCode) {
     updateCourseCardState(courseCode);
     renderSchedule();
     updateCredits();
+    saveToStorage();
 }
 
 function updateCourseCardState(courseCode) {
@@ -612,6 +713,7 @@ function clearSchedule() {
     renderSchedule();
     updateCredits();
     filterAndRenderCourses();
+    saveToStorage();
 }
 
 function exportSchedule() {
@@ -650,6 +752,7 @@ function selectAllCourses() {
     renderSchedule();
     updateCredits();
     filterAndRenderCourses();
+    saveToStorage();
 
     if (skipped > 0) {
         alert(`已選擇 ${added} 門課程，${skipped} 門因時間衝突而跳過`);
@@ -668,4 +771,5 @@ function deselectAllCourses() {
     renderSchedule();
     updateCredits();
     filterAndRenderCourses();
+    saveToStorage();
 }
