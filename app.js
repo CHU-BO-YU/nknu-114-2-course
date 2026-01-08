@@ -341,33 +341,83 @@ function exportScheduleToCSV() {
         return;
     }
 
-    // 定義 CSV 標頭
-    const headers = ['課程代碼', '課程名稱', '開課系所', '年級', '類別', '學分', '教師', '時間', '教室'];
+    // 1. 初始化 15 x 8 的矩陣 (Row: 節次, Col: 星期0~7, 0是大標題)
+    // 假設最多 14 節 + 標題列
+    // defined constants
+    const days = ['', '週一', '週二', '週三', '週四', '週五', '週六', '週日'];
+    const periods = [
+        '第1節 (08:10-09:00)', '第2節 (09:10-10:00)', '第3節 (10:10-11:00)', '第4節 (11:10-12:00)',
+        '第5節 (12:40-13:30)', '第6節 (13:40-14:30)', '第7節 (14:40-15:30)', '第8節 (15:40-16:30)',
+        '第9節 (16:40-17:30)', '第10節 (17:35-18:25)', '第11節 (18:30-19:20)', '第12節 (19:25-20:15)',
+        '第13節 (20:20-21:10)', '第14節 (21:15-22:05)'
+    ];
 
-    // 轉換資料
-    const rows = selectedCourses.map(c => [
-        c.course_code,
-        c.course_name_zh,
-        c.department,
-        c.offering_unit,
-        c.course_type,
-        c.credits,
-        c.instructor,
-        `"${getClassTime(c)}"`, // 避免逗號分隔錯誤
-        c.classroom
-    ]);
+    // 建立空的二維陣列 (14 rows x 8 cols)
+    // grid[periodIndex][dayIndex]
+    const grid = Array.from({ length: 14 }, () => Array(8).fill(''));
 
-    // 組合 CSV 內容 (加上 BOM 以支援 Excel 中文顯示)
-    const csvContent = '\uFEFF' + [headers, ...rows]
-        .map(e => e.join(','))
-        .join('\n');
+    // 填入第一欄的節次名稱
+    grid.forEach((row, index) => {
+        row[0] = periods[index];
+    });
 
-    // 下載檔案
+    // 2. 填入課程資料
+    selectedCourses.forEach(course => {
+        const timeStr = getClassTime(course); // ex: "13,14"
+        const slots = parseClassTime(timeStr);
+
+        slots.forEach(slot => {
+            // slot.day: 1~7 (週一~週日)
+            // slot.period: 1~14 or A,B,C... (需轉為 index)
+
+            // 處理節次轉換 (這裡簡化處理，假設 period 是 "1"~"14" 的字串)
+            // 這邊需要一個 helper 或簡單的 parseInt
+            let pIndex = -1;
+            // 嘗試解析數字
+            const pNum = parseInt(slot.period);
+            if (!isNaN(pNum) && pNum >= 1 && pNum <= 14) {
+                pIndex = pNum - 1;
+            } else {
+                // 處理特殊節次如 A, B, C (早修/午休) 如有需要
+                // 目前系統主要用數字 1-14
+            }
+
+            if (pIndex >= 0 && pIndex < 14 && slot.day >= 1 && slot.day <= 7) {
+                const content = `${course.course_name_zh}\n(${course.instructor || '未定'}/${course.classroom || '未知'})`;
+
+                // 如果該格已有內容 (極少見衝堂)，用分號串接
+                if (grid[pIndex][slot.day]) {
+                    grid[pIndex][slot.day] += `\n---\n${content}`;
+                } else {
+                    grid[pIndex][slot.day] = content;
+                }
+            }
+        });
+    });
+
+    // 3. 組合 CSV
+    // 加入標題列
+    const csvRows = [days.join(',')];
+
+    // 加入內容列
+    grid.forEach(row => {
+        // 對每個儲存格內容進行 CSV 轉義 (處理換行和逗號)
+        const escapedRow = row.map(cell => {
+            if (!cell) return '';
+            // 將內容包在引號中，並將內部的引號重複一次 (CSV 標準)
+            return `"${cell.replace(/"/g, '""')}"`;
+        });
+        csvRows.push(escapedRow.join(','));
+    });
+
+    const csvContent = '\uFEFF' + csvRows.join('\n');
+
+    // 下載
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'my_schedule.csv');
+    link.setAttribute('download', 'my_schedule_matrix.csv');
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
