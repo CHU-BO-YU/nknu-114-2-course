@@ -1,0 +1,8 @@
+# Git 忽略檔案
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+output/
+*.log

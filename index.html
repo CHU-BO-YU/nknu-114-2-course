@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排課系統</title>
+    <meta name="description" content="課程排課系統">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">排課系統</h1>
+            <p class="subtitle">課程選課助手</p>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <!-- 篩選區 -->
+        <section class="filter-section">
+            <div class="filter-group">
+                <label for="degree-select">選擇學制</label>
+                <select id="degree-select">
+                    <option value="">-- 全部學制 --</option>
+                    <option value="大學部">大學部</option>
+                    <option value="碩士班">碩士班</option>
+                    <option value="博士班">博士班</option>
+                    <option value="通識">通識/體育/軍訓</option>
+                    <option value="學院">學院開課</option>
+                    <option value="學程">學程/專長</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="department-select">選擇系所</label>
+                <select id="department-select">
+                    <option value="">-- 請選擇系所 --</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="grade-select">選擇年級</label>
+                <select id="grade-select">
+                    <option value="">-- 全部年級 --</option>
+                    <option value="一">一年級</option>
+                    <option value="二">二年級</option>
+                    <option value="三">三年級</option>
+                    <option value="四">四年級</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="type-select">課程類型</label>
+                <select id="type-select">
+                    <option value="">-- 全部類型 --</option>
+                    <option value="必修">必修</option>
+                    <option value="選修">選修</option>
+                </select>
+            </div>
+            <div class="filter-stats">
+                <span id="course-count">0</span> 門課程
+            </div>
+        </section>
+
+        <div class="content-grid">
+            <!-- 課程列表 -->
+            <section class="course-list-section">
+                <h2>課程列表</h2>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜尋課程名稱或教師...">
+                </div>
+                <div class="list-actions">
+                    <button id="select-all-btn" class="btn btn-success btn-sm">全選</button>
+                    <button id="deselect-all-btn" class="btn btn-secondary btn-sm">取消全選</button>
+                </div>
+                <div id="course-list" class="course-list">
+                    <p class="placeholder-text">請選擇系所以顯示課程</p>
+                </div>
+            </section>
+
+            <!-- 課表 -->
+            <section class="schedule-section">
+                <h2>我的課表 <span id="selected-credits">(0 學分)</span></h2>
+                <div class="schedule-wrapper">
+                    <table class="schedule-table" id="schedule-table">
+                        <thead>
+                            <tr>
+                                <th class="time-col">節次</th>
+                                <th>週一</th>
+                                <th>週二</th>
+                                <th>週三</th>
+                                <th>週四</th>
+                                <th>週五</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-body">
+                            <!-- 動態生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="schedule-actions">
+                    <button id="clear-btn" class="btn btn-secondary">清空課表</button>
+                    <button id="export-btn" class="btn btn-primary">匯出圖片</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 衝堂提示 Modal -->
+    <div id="conflict-modal" class="modal">
+        <div class="modal-content">
+            <h3>時間衝突</h3>
+            <p id="conflict-message"></p>
+            <button class="btn btn-primary" onclick="closeModal()">確定</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>資料僅供參考</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
