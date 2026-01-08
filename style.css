@@ -654,7 +654,8 @@ body {
     }
 
     .filter-group select {
-        min-width: 100%;
+        width: 100%;
+        max-width: 100%;
     }
 
     .filter-stats {
