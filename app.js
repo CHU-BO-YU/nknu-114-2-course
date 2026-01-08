@@ -322,7 +322,7 @@ function loadFromStorage() {
                 // 我們應該在 init() 的 fetch 完成後呼叫 loadFromStorage
                 selectedCourses = parsed;
                 updateSchedule();
-                updateCourseListState();
+                // updateCourseListState(); // 移除：此函數不存在，且 renderCourseList 會處理初始狀態
             }
         } catch (e) {
             console.error('Failed to load schedule from storage', e);
